@@ -1,0 +1,20 @@
+# Wyklucz katalog środowiska wirtualnego
+env/
+
+# Wyklucz pliki Python
+*.pyc
+__pycache__/
+
+# Wyklucz pliki konfiguracji IDE
+.vscode/
+.idea/
+
+# Wyklucz pliki logów
+*.log
+
+# Wyklucz pliki tymczasowe systemu
+*.swp
+.DS_Store
+
+# Wyklucz inne pliki tymczasowe
+*.tmp
