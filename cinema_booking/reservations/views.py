@@ -1,5 +1,6 @@
 from rest_framework import viewsets, generics, permissions
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
@@ -17,6 +18,16 @@ class ScreeningViewSet(viewsets.ModelViewSet):
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+
+    def perform_create(self, serializer):
+        reservation = serializer.save()
+        self.send_confirmation_email(reservation)
+
+    def send_confirmation_email(self, reservation):
+        subject = 'Potwierdznie rezerwacji'
+        message = f'Dziękujemy za rezerwacje {reservation.seats_reserved} miejsc na film {reservation.screening.movie.title}.'
+        recipient_list = [reservation.customer_email]
+        send_mail(subject, message, 'from@example.com', recipient_list)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
