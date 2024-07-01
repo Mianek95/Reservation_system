@@ -18,6 +18,21 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = '__all__'
 
+    def validate(self, attrs):
+        screening = attrs['screening']
+        seat_reserved = attrs['seats_reserved']
+        if seat_reserved > screening.available_seats:
+            raise serializers.ValidationError("Not enough available seats.")
+        return attrs
+    
+    def create(self, validated_data):
+        screening = validated_data['screening']
+        seats_reserved = validated_data['seats_reserved']
+        if screening.reserve_seats(seats_reserved):
+            return super().create(validated_data)
+        else:
+            raise serializers.ValidationError("Could not reserve seats.")
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
@@ -30,9 +45,9 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
-        
+
         return attrs
-    
+
     def create(self, validated_data):
         user = User.objects.create(
             username=validated_data['username'],
@@ -43,7 +58,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
-    
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

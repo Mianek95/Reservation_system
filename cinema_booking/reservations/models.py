@@ -17,6 +17,13 @@ class Screening(models.Model):
     def __str__(self):
         return f"{self.movie.title} at {self.screening_time}"
     
+    def reserve_seats(self, number_of_seats):
+        if self.available_seats >= number_of_seats:
+            self.available_seats -= number_of_seats
+            self.save()
+            return True
+        return False
+    
 class Reservation(models.Model):
     screening = models.ForeignKey(Screening, on_delete=models.CASCADE)
     customer_name = models.CharField(max_length=100)
