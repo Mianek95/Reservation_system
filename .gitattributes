@@ -1,0 +1,17 @@
+
+* text=auto
+
+
+*.html text
+*.css text
+*.js text
+*.md text
+*.json text
+*.gitignore text
+
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
