@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from .models import Movie, Screening, Reservation
-from .serializers import MovieSerializer, ScreeningSerializer, ReservationSerializer, UserSerializer, RegisterSerializer
+from .serializers import MovieSerializer, ScreeningSerializer, ReservationSerializer, UserSerializer, RegisterSerializer, UserChangePasswordSerializer
 
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
@@ -41,3 +41,29 @@ class UserView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+    
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = UserChangePasswordSerializer
+    model = User
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+    
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+
+            self.object.set_password(serializer.data['password'])
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+            return Response(response)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
