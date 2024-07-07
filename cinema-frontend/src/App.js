@@ -5,8 +5,8 @@ import Home from './components/Home';
 import Register from './components/Register';
 import Login from './components/Login';
 import Reservation from './components/Reservation';
-import PasswordReset from './components/PasswordReset';
 import ChangePassword from './components/ChangePassword';
+import VerifyEmail from './components/VerifyEmail';
 
 const App = () => {
     return (
@@ -17,8 +17,8 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/reserve" element={<Reservation />} />
-                <Route path="/password_reset" element={<PasswordReset />} />
                 <Route path="/change_password" element={<ChangePassword />} />
+                <Route path="/verify/:uidb64/:token" element={<VerifyEmail />} />
             </Routes>
         </Router>
     );

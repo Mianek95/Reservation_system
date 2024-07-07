@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class Movie(models.Model):
@@ -32,3 +33,6 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f"Reservation for {self.customer_name} - {self.screening.movie.title}"
+    
+class CustomerUser(AbstractUser):
+    is_verified = models.BooleanField(default=False)
