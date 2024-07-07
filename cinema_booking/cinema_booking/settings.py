@@ -139,6 +139,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@example.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
+FRONTEND_URL = 'http://localhost:3000'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

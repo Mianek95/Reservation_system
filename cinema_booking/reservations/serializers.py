@@ -1,7 +1,16 @@
 from rest_framework import serializers
-from .models import Movie, Screening, Reservation
+from .models import Movie, Screening, Reservation, CustomerUser
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.conf import settings
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
+
+User = get_user_model()
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +47,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model = User
+        model = CustomerUser
         fields = ('username', 'password', 'password2', 'email')
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -49,13 +58,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = User.objects.create(
+        user = CustomerUser.objects.create_user(
             username=validated_data['username'],
-            email=validated_data['email']
+            email=validated_data['email'],
+            password=validated_data['password'],
         )
-        
-        user.set_password(validated_data['password'])
+        user.is_active = False
         user.save()
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        verification_link = f"{settings.FRONTEND_URL}/verify/{uid}/{token}"
+
+        send_mail(
+            'Verify your email',
+            f'Click the link to verify your email: {verification_link}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
 
         return user
 
